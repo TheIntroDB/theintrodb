@@ -1,5 +1,10 @@
 # TheIntroDB NPM Package
 
+[![npm package][npm-img]][npm-url]
+[![Build Status][build-img]][build-url]
+[![Downloads][downloads-img]][downloads-url]
+[![Code Coverage][codecov-img]][codecov-url]
+
 Typed TypeScript client for the TheIntroDB API, generated around the published OpenAPI contract.
 
 ## Install
@@ -207,3 +212,12 @@ await client.submitMediaTimestamp(
 npm run build
 npm test
 ```
+
+[build-img]:https://github.com/theintrodb/theintrodb/actions/workflows/release.yml/badge.svg
+[build-url]:https://github.com/theintrodb/theintrodb/actions/workflows/release.yml
+[downloads-img]:https://img.shields.io/npm/dt/theintrodb
+[downloads-url]:https://www.npmtrends.com/theintrodb
+[npm-img]:https://img.shields.io/npm/v/theintrodb
+[npm-url]:https://www.npmjs.com/package/theintrodb
+[codecov-img]:https://codecov.io/gh/theintrodb/theintrodb/branch/main/graph/badge.svg
+[codecov-url]:https://codecov.io/gh/theintrodb/theintrodb
