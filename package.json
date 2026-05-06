@@ -1,41 +1,64 @@
 {
   "name": "theintrodb",
-  "version": "0.0.0",
-  "description": "NPM package for easily and correctly implementing TheIntroDB into your project",
-  "main": "./lib/index.js",
+  "version": "1.0.0",
+  "description": "TypeScript client for retrieving and submitting intro, recap, credits, and preview timestamps from TheIntroDB API.",
+  "main": "./lib/main.js",
+  "types": "./lib/main.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/main.d.ts",
+      "require": "./lib/main.js",
+      "default": "./lib/main.js"
+    }
+  },
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theintrodb/theintrodb.git"
+  },
+  "bugs": {
+    "url": "https://github.com/theintrodb/theintrodb/issues"
+  },
+  "homepage": "https://theintrodb.org",
+  "license": "GPL-3.0-only",
   "files": [
     "lib/**/*"
   ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "clean": "rm -rf ./lib/",
-    "cm": "cz",
     "lint": "eslint ./src/ --fix",
     "prepare": "husky install",
     "semantic-release": "semantic-release",
     "test:watch": "jest --watch",
     "test": "jest --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run clean && npm run build && npm test"
   },
   "engines": {
-    "node": ">=12.0"
+    "node": ">=18.0"
   },
   "keywords": [
-    "boilerplate",
-    "template",
+    "theintrodb",
+    "skip-intro",
+    "api-client",
     "typescript",
-    "vscode",
-    "jest",
-    "husky",
-    "commitizen",
-    "semantic-release",
-    "codecov"
+    "timestamps",
+    "movies",
+    "tv"
   ],
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
   "devDependencies": {
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/github": "^11.0.3",
+    "@semantic-release/npm": "^12.0.2",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "@ryansonshine/commitizen": "^4.2.8",
     "@ryansonshine/cz-conventional-changelog": "^3.3.4",
     "@types/jest": "^27.5.2",
-    "@types/node": "^12.20.55",
+    "@types/node": "^20.17.47",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "conventional-changelog-conventionalcommits": "^5.0.0",
@@ -49,7 +72,6 @@
     "prettier": "^2.8.8",
     "semantic-release": "^25.0.3",
     "ts-jest": "^27.1.5",
-    "ts-node": "^10.9.2",
     "typescript": "^4.9.5"
   },
   "config": {

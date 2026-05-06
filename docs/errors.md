@@ -1,0 +1,90 @@
+# Errors And Validation
+
+## Error Classes
+
+### TheIntroDbValidationError
+
+Thrown when input validation fails before a request is sent.
+
+Common cases:
+
+- missing `tmdbId` and `imdbId` for `getMedia()`
+- missing `season` or `episode` for TV requests
+- mixed seconds and milliseconds in one submission
+- missing current-user API key for `submitMediaTimestamp()`
+
+### TheIntroDbResponseValidationError
+
+Thrown when the server returns JSON that does not match the expected schema.
+
+Common cases:
+
+- missing required response fields
+- wrong data types in returned JSON
+- empty response body where JSON is expected
+
+### TheIntroDbApiError
+
+Thrown when the API responds with a non-2xx status.
+
+Useful properties:
+
+- `status`
+- `details`
+- `code`
+- `body`
+- `rateLimit`
+
+## Validation Layers
+
+This package validates in three places:
+
+1. Before sending requests
+2. After receiving JSON responses
+3. During timestamp normalization
+
+## Rate Limit Metadata
+
+`TheIntroDbApiError.rateLimit` contains parsed values from these headers when present:
+
+- `X-RateLimit-Limit`
+- `X-RateLimit-Remaining`
+- `X-RateLimit-Reset`
+- `X-UsageLimit-Limit`
+- `X-UsageLimit-Remaining`
+- `X-UsageLimit-Reset`
+
+## Example Error Handling
+
+```ts
+import {
+  TheIntroDbApiError,
+  TheIntroDbResponseValidationError,
+  TheIntroDbValidationError,
+} from 'theintrodb';
+
+try {
+  await client.submitMediaTimestamp(
+    {
+      tmdbId: 12345,
+      type: 'movie',
+      segment: 'intro',
+      startSec: 0,
+      endSec: 90,
+    },
+    {
+      apiKey: currentUserApiKey,
+    }
+  );
+} catch (error) {
+  if (error instanceof TheIntroDbValidationError) {
+    console.error('Input problem:', error.issues);
+  } else if (error instanceof TheIntroDbResponseValidationError) {
+    console.error('Unexpected API response:', error.body);
+  } else if (error instanceof TheIntroDbApiError) {
+    console.error('API failure:', error.status, error.code, error.rateLimit);
+  } else {
+    throw error;
+  }
+}
+```

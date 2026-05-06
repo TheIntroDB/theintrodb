@@ -1,0 +1,279 @@
+# Types
+
+## Exported Constants
+
+### MEDIA_TYPES
+
+Readonly array of supported media kinds:
+
+- `'movie'`
+- `'tv'`
+
+### SEGMENT_TYPES
+
+Readonly array of supported segment kinds:
+
+- `'intro'`
+- `'recap'`
+- `'credits'`
+- `'preview'`
+
+### SUBMISSION_STATUSES
+
+Readonly array of submission states:
+
+- `'pending'`
+- `'accepted'`
+- `'rejected'`
+
+## Core Client Types
+
+### TIDBClient
+
+Returned by `createIntroDbClient()`.
+
+Methods:
+
+- `getMedia(params, requestOptions?)`
+- `submitMediaTimestamp(input, requestOptions?)`
+
+### TIDBClientOptions
+
+Shared options for a reusable client instance.
+
+Fields:
+
+- `baseUrl?`
+- `apiKey?`
+- `headers?`
+- `fetch?`
+- `logger?`
+
+### TIDBRequestOptions
+
+Per-request overrides for client methods.
+
+Fields:
+
+- `apiKey?`
+- `headers?`
+- `logger?`
+- `signal?`
+
+### TIDBTransportOptions
+
+Transport options used by standalone functions.
+
+Fields:
+
+- `baseUrl?`
+- `apiKey?`
+- `headers?`
+- `fetch?`
+- `logger?`
+- `signal?`
+
+### TIDBLogger
+
+Optional logging interface.
+
+Methods:
+
+- `debug?(message, context?)`
+- `info?(message, context?)`
+- `warn?(message, context?)`
+- `error?(message, context?)`
+
+## Media Types
+
+### MediaType
+
+Union of:
+
+- `'movie'`
+- `'tv'`
+
+### SegmentType
+
+Union of:
+
+- `'intro'`
+- `'recap'`
+- `'credits'`
+- `'preview'`
+
+### SubmissionStatus
+
+Union of:
+
+- `'pending'`
+- `'accepted'`
+- `'rejected'`
+
+## Request Types
+
+### GetMediaParams
+
+Fields:
+
+- `tmdbId?`
+- `imdbId?`
+- `season?`
+- `episode?`
+
+Notes:
+
+- provide `tmdbId` for movies
+- provide `tmdbId`, `season`, and `episode` for TV episodes
+- `imdbId` is supported when TMDB is not available
+
+### SubmitMediaBase
+
+Shared base fields for submission inputs.
+
+Fields:
+
+- `tmdbId`
+- `imdbId?`
+- `tvdbId?`
+- `type`
+- `segment`
+- `season?`
+- `episode?`
+
+### SubmitMediaSecondsInput
+
+Seconds-based submission.
+
+Fields:
+
+- `startSec?`
+- `endSec?`
+
+### SubmitMediaMillisecondsInput
+
+Milliseconds-based submission.
+
+Fields:
+
+- `startMs?`
+- `endMs?`
+
+### SubmitMediaTimestampInput
+
+Union of:
+
+- `SubmitMediaSecondsInput`
+- `SubmitMediaMillisecondsInput`
+
+### SubmissionRequestPayload
+
+Serialized raw payload sent to `/submit`.
+
+Fields:
+
+- `tmdb_id`
+- `imdb_id?`
+- `tvdb_id?`
+- `type`
+- `segment`
+- `season?`
+- `episode?`
+- `start_ms?`
+- `end_ms?`
+
+## Response Types
+
+### SegmentTimestampRaw
+
+Raw timestamp object from the API.
+
+Fields:
+
+- `start_ms`
+- `end_ms`
+
+### NormalizedSegmentTimestamp
+
+Normalized runtime timestamp shape.
+
+Fields:
+
+- `startMs`
+- `endMs`
+- `durationMs`
+- `startsAtBeginning`
+- `endsAtMediaEnd`
+
+### MediaResponseRaw
+
+Raw `/media` response.
+
+### MediaRecord
+
+Normalized media result returned by the package.
+
+Fields:
+
+- `tmdbId`
+- `type`
+- `season?`
+- `episode?`
+- `intro`
+- `recap`
+- `credits`
+- `preview`
+
+### SubmissionDataRaw
+
+Raw submission object from the API.
+
+### SubmissionData
+
+Normalized submission object returned by the package.
+
+Fields:
+
+- `id`
+- `tmdbId`
+- `type`
+- `segment`
+- `season?`
+- `episode?`
+- `startMs`
+- `endMs`
+- `durationMs`
+- `startsAtBeginning`
+- `endsAtMediaEnd`
+- `status`
+- `weight`
+
+### SubmissionResponseRaw
+
+Raw success response from `/submit`.
+
+### SubmissionResponse
+
+Normalized success response returned by the package.
+
+## Utility Types
+
+### RateLimitDetails
+
+Parsed rate-limit and usage-limit metadata.
+
+### ErrorResponse
+
+API error body shape.
+
+### HeadersLike
+
+Minimal header reader contract used by the transport layer.
+
+### FetchResponseLike
+
+Minimal fetch response shape expected by the package.
+
+### FetchLike
+
+Minimal fetch function shape accepted by the package.

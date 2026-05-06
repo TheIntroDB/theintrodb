@@ -1,108 +1,133 @@
-# typescript-npm-package-template
+# TheIntroDB NPM Package
 
-> Template to kickstart creating a Node.js module using TypeScript and VSCode
+Typed TypeScript client for the TheIntroDB API, generated around the published OpenAPI contract.
 
-Inspired by [node-module-boilerplate](https://github.com/sindresorhus/node-module-boilerplate)
-
-## Features
-
-- [Semantic Release](https://github.com/semantic-release/semantic-release)
-- [Issue Templates](https://github.com/ryansonshine/typescript-npm-package-template/tree/main/.github/ISSUE_TEMPLATE)
-- [GitHub Actions](https://github.com/ryansonshine/typescript-npm-package-template/tree/main/.github/workflows)
-- [Codecov](https://about.codecov.io/)
-- [VSCode Launch Configurations](https://github.com/ryansonshine/typescript-npm-package-template/blob/main/.vscode/launch.json)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Husky](https://github.com/typicode/husky)
-- [Lint Staged](https://github.com/okonet/lint-staged)
-- [Commitizen](https://github.com/search?q=commitizen)
-- [Jest](https://jestjs.io/)
-- [ESLint](https://eslint.org/)
-- [Prettier](https://prettier.io/)
-
-## Getting started
-
-### Set up your repository
-
-**Click the "Use this template" button.**
-
-Alternatively, create a new directory and then run:
-
-```bash
-curl -fsSL https://github.com/ryansonshine/typescript-npm-package-template/archive/main.tar.gz | tar -xz --strip-components=1
-```
-
-Replace `FULL_NAME`, `GITHUB_USER`, and `REPO_NAME` in the script below with your own details to personalize your new package:
-
-```bash
-FULL_NAME="John Smith"
-GITHUB_USER="johnsmith"
-REPO_NAME="my-cool-package"
-sed -i.mybak "s/\([\/\"]\)(ryansonshine)/$GITHUB_USER/g; s/typescript-npm-package-template\|my-package-name/$REPO_NAME/g; s/Ryan Sonshine/$FULL_NAME/g" package.json package-lock.json README.md
-rm *.mybak
-```
-
-### Add NPM Token
-
-Add your npm token to your GitHub repository secrets as `NPM_TOKEN`.
-
-### Add Codecov integration
-
-Enable the Codecov GitHub App [here](https://github.com/apps/codecov).
-
-**Remove everything from here and above**
-
----
-
-# my-package-name
-
-[![npm package][npm-img]][npm-url]
-[![Build Status][build-img]][build-url]
-[![Downloads][downloads-img]][downloads-url]
-[![Code Coverage][codecov-img]][codecov-url]
-
-> My awesome module
+Detailed GitHub Pages docs live in `docs/`.
 
 ## Install
 
 ```bash
-npm install my-package-name
+npm install theintrodb
 ```
 
-## Usage
+## Features
+
+- Centralized request, parsing, and validation logic
+- Runtime validation of request payloads and API responses
+- `GET /media` works without auth and can optionally use a current user API key
+- `POST /submit` requires the current user's API key so submissions go to that account
+- Normalized timestamp handling keeps `null` end times as "end of media" and converts `null` starts to `0`
+- Reusable client or standalone function usage
+- Optional logging hooks for auth-sensitive request flows
+- Jest-based unit coverage for transport, parsing, and edge cases
+
+## Example Usage
 
 ```ts
-import { myPackage } from 'my-package-name';
+import { createIntroDbClient } from 'theintrodb';
 
-myPackage('hello');
-//=> 'hello from my package'
+const client = createIntroDbClient({
+  // Optional: pass a logger if you want TIDB request/auth messages.
+  // `console` is fine for quick debugging; omit this entirely if you do not want logs.
+  logger: console,
+});
+
+// Public movie lookup: no API key required.
+const publicMedia = await client.getMedia({
+  tmdbId: 12345,
+});
+
+// Public TV lookup: include `season` and `episode` for a specific episode.
+const publicEpisodeMedia = await client.getMedia({
+  tmdbId: 67890,
+  season: 1,
+  episode: 1,
+});
+
+// Optional current-user API key:
+// this can include that user's still-pending submissions in the response.
+const mediaWithMyPendingSubmissions = await client.getMedia(
+  {
+    tmdbId: 12345,
+  },
+  {
+    apiKey: currentUserApiKey,
+  }
+);
+
+// Submissions always require the current user's API key.
+// The key should belong to the end user so the submission is attached to their account.
+const submission = await client.submitMediaTimestamp(
+  {
+    tmdbId: 12345,
+    type: 'movie',
+    segment: 'intro',
+    startSec: 0,
+    endSec: 90,
+  },
+  {
+    apiKey: currentUserApiKey,
+  }
+);
 ```
 
-## API
+## Auth Model
 
-### myPackage(input, options?)
+- `getMedia()` does not require authentication
+- `getMedia()` optionally accepts the current user's API key; when provided, the API may include that user's pending submissions in the weighted result
+- `submitMediaTimestamp()` always requires the current user's API key
+- Do not ship a shared application API key; this package is designed for end-user keys
 
-#### input
+## API Notes
 
-Type: `string`
+### Get Media Timestamps
 
-Lorem ipsum.
+- Use `tmdbId` for movies
+- Use `tmdbId`, `season`, and `episode` for TV episodes
+- `imdbId` is supported but `tmdbId` remains the preferred canonical identifier
+- Segment arrays are omitted by the API when no submissions exist for that segment type
 
-#### options
+### Submit Timestamps
 
-Type: `object`
+- Submit one segment at a time to `submitMediaTimestamp()`
+- Use either `startSec`/`endSec` or `startMs`/`endMs`, never both
+- `intro` and `recap` allow `null` starts
+- `credits` and `preview` allow `null` ends, which mean "to the end of media"
 
-##### postfix
+## Timestamp Semantics
 
-Type: `string`
-Default: `rainbows`
+- `intro` and `recap`: `null` or `0` start values are normalized to `0`
+- `credits` and `preview`: `null` end values remain `null`
+- Normalized responses include `startsAtBeginning` and `endsAtMediaEnd` flags
 
-Lorem ipsum.
+## Submission Example
 
-[build-img]:https://github.com/theintrodb/theintrodb/actions/workflows/release.yml/badge.svg
-[build-url]:https://github.com/theintrodb/theintrodb/actions/workflows/release.yml
-[downloads-img]:https://img.shields.io/npm/dt/theintrodb
-[downloads-url]:https://www.npmtrends.com/theintrodb
-[npm-img]:https://img.shields.io/npm/v/theintrodb
-[npm-url]:https://www.npmjs.com/package/theintrodb
-[codecov-img]:https://codecov.io/gh/theintrodb/theintrodb/branch/main/graph/badge.svg
-[codecov-url]:https://codecov.io/gh/theintrodb/theintrodb
+```ts
+await client.submitMediaTimestamp(
+  {
+    tmdbId: 12345,
+    type: 'tv',
+    season: 1,
+    episode: 1,
+    segment: 'credits',
+    startSec: 5400,
+    endSec: null,
+  },
+  {
+    apiKey: currentUserApiKey,
+  }
+);
+```
+
+## Important
+
+- User API keys are optional for reads and required for submissions
+- When a user supplies their API key to `getMedia()`, they can see pending submissions tied to their own account
+- This package validates payloads locally before making requests and validates JSON responses after receiving them
+
+## Build
+
+```bash
+npm run build
+npm test
+```
