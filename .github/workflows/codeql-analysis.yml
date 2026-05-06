@@ -1,4 +1,4 @@
-name: "Codecove Coverage"
+name: "Codecove"
 
 permissions:
   security-events: write
