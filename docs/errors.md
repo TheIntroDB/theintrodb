@@ -43,6 +43,23 @@ This package validates in three places:
 2. After receiving JSON responses
 3. During timestamp normalization
 
+## Time-Related Validation Details
+
+Time handling is one of the main validation responsibilities of the package.
+
+Before a submission is sent, the package validates:
+
+- that you use either seconds or milliseconds, but not both
+- that TV submissions include `season` and `episode`
+- that segment-specific null behavior is respected
+- that durations and endpoints are consistent with the API rules
+
+During parsing and normalization, the package also preserves the meaning of API time values:
+
+- `start_ms: null` is interpreted as "start of media"
+- `end_ms: null` is interpreted as "end of media"
+- normalized output keeps that meaning through `startMs`, `endMs`, `startsAtBeginning`, and `endsAtMediaEnd`
+
 ## Rate Limit Metadata
 
 `TheIntroDbApiError.rateLimit` contains parsed values from these headers when present:

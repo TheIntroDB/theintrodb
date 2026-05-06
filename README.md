@@ -2,8 +2,6 @@
 
 Typed TypeScript client for the TheIntroDB API, generated around the published OpenAPI contract.
 
-Detailed GitHub Pages docs live in `docs/`.
-
 ## Install
 
 ```bash
@@ -99,6 +97,84 @@ const submission = await client.submitMediaTimestamp(
 - `intro` and `recap`: `null` or `0` start values are normalized to `0`
 - `credits` and `preview`: `null` end values remain `null`
 - Normalized responses include `startsAtBeginning` and `endsAtMediaEnd` flags
+
+## How The API Returns Times
+
+TheIntroDB returns media timestamps from `GET /media` in arrays of objects shaped like:
+
+```json
+{
+  "start_ms": 30000,
+  "end_ms": 90000
+}
+```
+
+Important details:
+
+- The API returns response times in milliseconds, using the raw fields `start_ms` and `end_ms`
+- Each segment type such as `intro`, `recap`, `credits`, and `preview` is returned as an array
+- `start_ms: null` means the segment starts at the beginning of the media
+- `end_ms: null` means the segment continues to the end of the media
+- A segment array may be omitted entirely if no submissions exist for that segment type
+
+This package normalizes those raw values into:
+
+- `startMs`
+- `endMs`
+- `durationMs`
+- `startsAtBeginning`
+- `endsAtMediaEnd`
+
+Example raw API response fragment:
+
+```json
+{
+  "intro": [
+    {
+      "start_ms": null,
+      "end_ms": 90000
+    }
+  ],
+  "credits": [
+    {
+      "start_ms": 1800000,
+      "end_ms": null
+    }
+  ]
+}
+```
+
+Normalized package result:
+
+```ts
+{
+  intro: [
+    {
+      startMs: 0,
+      endMs: 90000,
+      durationMs: 90000,
+      startsAtBeginning: true,
+      endsAtMediaEnd: false,
+    },
+  ],
+  credits: [
+    {
+      startMs: 1800000,
+      endMs: null,
+      durationMs: null,
+      startsAtBeginning: false,
+      endsAtMediaEnd: true,
+    },
+  ],
+}
+```
+
+For submissions, the API accepts either:
+
+- `startSec` and `endSec` in seconds with decimal precision
+- `startMs` and `endMs` in integer milliseconds
+
+The package converts second-based inputs into millisecond request values before sending them to TheIntroDB.
 
 ## Submission Example
 

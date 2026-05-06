@@ -184,6 +184,20 @@ Fields:
 
 ## Response Types
 
+### API Time Naming
+
+TheIntroDB uses two different naming styles depending on context:
+
+- raw API responses from `GET /media` use `start_ms` and `end_ms`
+- raw success responses from `POST /submit` use `startMs` and `endMs`
+- this package exposes normalized runtime objects using `startMs` and `endMs`
+
+The API also uses two different time units depending on request direction:
+
+- response times are returned in milliseconds
+- submission inputs can be provided in seconds or milliseconds
+- second-based submission inputs are converted to milliseconds before being sent
+
 ### SegmentTimestampRaw
 
 Raw timestamp object from the API.
@@ -192,6 +206,12 @@ Fields:
 
 - `start_ms`
 - `end_ms`
+
+Notes:
+
+- used by `GET /media`
+- `start_ms: null` means the segment starts at the beginning
+- `end_ms: null` means the segment runs to the media end
 
 ### NormalizedSegmentTimestamp
 
@@ -204,6 +224,12 @@ Fields:
 - `durationMs`
 - `startsAtBeginning`
 - `endsAtMediaEnd`
+
+Notes:
+
+- `startMs` is always a number
+- when the raw API used `start_ms: null`, this package returns `startMs: 0`
+- `endMs` remains `null` when the raw API means "to the end of media"
 
 ### MediaResponseRaw
 
@@ -228,6 +254,13 @@ Fields:
 
 Raw submission object from the API.
 
+Notes:
+
+- returned by successful `POST /submit` responses
+- uses camelCase field names from the backend response: `startMs` and `endMs`
+- `startMs: null` can appear for intro/recap submissions that begin at the start
+- `endMs: null` can appear for credits/preview submissions that go to the end
+
 ### SubmissionData
 
 Normalized submission object returned by the package.
@@ -247,6 +280,12 @@ Fields:
 - `endsAtMediaEnd`
 - `status`
 - `weight`
+
+Notes:
+
+- keeps `endMs: null` when the submission means "to the end of media"
+- converts `startMs: null` to `startMs: 0`
+- adds `durationMs`, `startsAtBeginning`, and `endsAtMediaEnd`
 
 ### SubmissionResponseRaw
 

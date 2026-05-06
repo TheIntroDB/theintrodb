@@ -45,6 +45,23 @@ getMedia(
 
 A normalized `MediaRecord`.
 
+### Raw API Time Shape
+
+The API returns media timestamps in milliseconds using raw snake_case fields:
+
+```json
+{
+  "start_ms": 30000,
+  "end_ms": 90000
+}
+```
+
+Special cases:
+
+- `start_ms: null` means "starts at the beginning"
+- `end_ms: null` means "runs to the end of the media"
+- segment properties such as `intro` or `credits` may be omitted if no data exists
+
 ## submitMediaTimestamp(input, transportOptions?)
 
 Submits a single segment timestamp payload.
@@ -104,6 +121,7 @@ serializeSubmissionRequest(
 - `intro` and `recap` starts of `0` or `null` become `start_ms: null`
 - `credits` and `preview` null ends stay `end_ms: null`
 - seconds are rounded to milliseconds
+- The outgoing API payload always uses millisecond field names: `start_ms` and `end_ms`
 
 ## parseMediaResponse(body)
 
@@ -114,6 +132,14 @@ Validates raw JSON against the expected `/media` schema and returns a normalized
 ```ts
 parseMediaResponse(body: unknown): MediaRecord
 ```
+
+### What It Normalizes
+
+- `start_ms` becomes `startMs`
+- `end_ms` becomes `endMs`
+- `start_ms: null` becomes `startMs: 0`
+- `end_ms: null` stays `endMs: null`
+- derived fields such as `durationMs`, `startsAtBeginning`, and `endsAtMediaEnd` are added
 
 ## parseSubmissionResponse(body)
 
@@ -142,3 +168,4 @@ normalizeSegmentTimestamp(
 - `start_ms: null` becomes `startMs: 0`
 - `end_ms: null` stays `endMs: null`
 - `durationMs` is `null` if the end is unknown
+- `startsAtBeginning` and `endsAtMediaEnd` preserve the meaning of the original `null` values

@@ -106,6 +106,61 @@ Do not mix seconds and milliseconds in the same submission.
   - `endsAtMediaEnd`
   - `durationMs`
 
+## How TheIntroDB Returns Time Data
+
+For `GET /media`, TheIntroDB returns raw timestamps in milliseconds using `start_ms` and `end_ms`.
+
+Example:
+
+```json
+{
+  "tmdb_id": 12345,
+  "type": "movie",
+  "intro": [
+    {
+      "start_ms": null,
+      "end_ms": 90000
+    }
+  ],
+  "credits": [
+    {
+      "start_ms": 1800000,
+      "end_ms": null
+    }
+  ]
+}
+```
+
+Meaning:
+
+- `start_ms: null` means the segment starts at the beginning of the media
+- `end_ms: null` means the segment reaches the end of the media
+- Each segment type is an array because the API can return multiple timestamp ranges for the same kind of segment
+- If a segment type has no data, that property may be omitted from the response
+
+This package maps that raw shape into a normalized runtime shape:
+
+```ts
+{
+  intro: [
+    {
+      startMs: 0,
+      endMs: 90000,
+      durationMs: 90000,
+      startsAtBeginning: true,
+      endsAtMediaEnd: false,
+    },
+  ],
+}
+```
+
+For `POST /submit`, the API accepts either:
+
+- seconds with decimals: `startSec` and `endSec`
+- integer milliseconds: `startMs` and `endMs`
+
+The package validates the input format and converts seconds to millisecond request values before sending the request.
+
 ## Logging
 
 Logging is optional.
