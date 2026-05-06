@@ -7,6 +7,8 @@
 
 Typed TypeScript client for the TheIntroDB API, generated around the published OpenAPI contract.
 
+Detailed documentation can be found at: https://theintrodb.github.io/theintrodb-npm/
+
 ## Install
 
 ```bash
