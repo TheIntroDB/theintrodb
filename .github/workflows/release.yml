@@ -4,6 +4,7 @@ on:
     secrets:
       NPM_TOKEN:
         required: true
+  workflow_dispatch:
 
 jobs:
   release:
