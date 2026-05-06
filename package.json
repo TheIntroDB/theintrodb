@@ -58,7 +58,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.4.1",
     "husky": "^6.0.0",
-    "jest": "^30.3.0",
+    "jest": "^27.5.1",
     "lint-staged": "^13.3.0",
     "prettier": "^2.8.8",
     "semantic-release": "^25.0.3",
