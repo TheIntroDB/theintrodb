@@ -14,10 +14,10 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/theintrodb/theintrodb.git"
+    "url": "https://github.com/theintrodb/theintrodb-npm.git"
   },
   "bugs": {
-    "url": "https://github.com/theintrodb/theintrodb/issues"
+    "url": "https://github.com/theintrodb/theintrodb-npm/issues"
   },
   "homepage": "https://theintrodb.org",
   "license": "GPL-3.0-only",
