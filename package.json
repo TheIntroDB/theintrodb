@@ -2,13 +2,13 @@
   "name": "theintrodb",
   "version": "1.0.0",
   "description": "TypeScript client for retrieving and submitting intro, recap, credits, and preview timestamps from TheIntroDB API.",
-  "main": "./lib/main.js",
-  "types": "./lib/main.d.ts",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/main.d.ts",
-      "require": "./lib/main.js",
-      "default": "./lib/main.js"
+      "types": "./lib/index.d.ts",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
     }
   },
   "sideEffects": false,
@@ -21,6 +21,9 @@
   },
   "homepage": "https://theintrodb.org",
   "license": "GPL-3.0-only",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "lib/**/*"
   ],
