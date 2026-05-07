@@ -5,7 +5,7 @@
 [![Downloads][downloads-img]][downloads-url]
 [![Code Coverage][codecov-img]][codecov-url]
 
-Typed TypeScript client for the TheIntroDB API, generated around the published OpenAPI contract.
+Typed TypeScript client package for the TheIntroDB API.
 
 Detailed documentation can be found at: https://theintrodb.github.io/theintrodb-npm/
 
@@ -91,6 +91,7 @@ const submission = await client.submitMediaTimestamp(
 - Use `tmdbId`, `season`, and `episode` for TV episodes
 - `imdbId` is supported but `tmdbId` remains the preferred canonical identifier
 - Segment arrays are omitted by the API when no submissions exist for that segment type
+- Segment arrays can contain multiple entries for the same segment type (for example, some episodes have multiple recaps); this is expected and should be handled by using all available segments
 
 ### Submit Timestamps
 
@@ -120,6 +121,7 @@ Important details:
 
 - The API returns response times in milliseconds, using the raw fields `start_ms` and `end_ms`
 - Each segment type such as `intro`, `recap`, `credits`, and `preview` is returned as an array
+- A segment array may contain multiple entries for the same segment type; this is not an error
 - `start_ms: null` means the segment starts at the beginning of the media
 - `end_ms: null` means the segment continues to the end of the media
 - A segment array may be omitted entirely if no submissions exist for that segment type

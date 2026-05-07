@@ -258,6 +258,11 @@ Fields:
 - `credits`
 - `preview`
 
+Notes:
+
+- `intro`, `recap`, `credits`, and `preview` are always arrays (this package normalizes missing segment properties to `[]`)
+- a segment array may contain multiple entries for the same segment type (for example, some episodes have multiple recaps); this is expected and is not an error
+
 ### SubmissionDataRaw
 
 Raw submission object from the API.

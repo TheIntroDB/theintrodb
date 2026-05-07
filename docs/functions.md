@@ -69,6 +69,7 @@ Special cases:
 - `start_ms: null` means "starts at the beginning"
 - `end_ms: null` means "runs to the end of the media"
 - segment properties such as `intro` or `credits` may be omitted if no data exists
+- segment properties are arrays and may contain multiple entries for the same segment type; this is expected for some media and is not an error. Use all segments.
 
 ## submitMediaTimestamp(input, transportOptions?)
 
