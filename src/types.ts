@@ -42,6 +42,8 @@ export interface SegmentTimestampRaw {
   start_ms: number | null;
   /** End offset in milliseconds. `null` means "continues to end of media". */
   end_ms: number | null;
+  confidence?: number | null;
+  submission_count?: number | null;
 }
 
 /**
@@ -58,6 +60,8 @@ export interface NormalizedSegmentTimestamp {
   startsAtBeginning: boolean;
   /** True when the source timestamp used `null` for the end. */
   endsAtMediaEnd: boolean;
+  confidence?: number | null;
+  submissionCount?: number | null;
 }
 
 /**
@@ -209,6 +213,7 @@ export interface GetMediaParams {
   season?: number;
   /** Episode number for TV episode lookups. */
   episode?: number;
+  details?: boolean;
 }
 
 /**

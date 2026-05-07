@@ -114,6 +114,47 @@ describe('TheIntroDB package', () => {
     );
   });
 
+  it('includes confidence and submission counts when details=true is requested', async () => {
+    const fetchMock = createFetchMock(
+      createResponse({
+        body: {
+          tmdb_id: 12345,
+          type: 'movie',
+          intro: [
+            {
+              start_ms: null,
+              end_ms: 90000,
+              confidence: 0.84,
+              submission_count: 12,
+            },
+          ],
+        },
+      })
+    );
+
+    const result = await getMedia(
+      { tmdbId: 12345, details: true },
+      { fetch: fetchMock, baseUrl: 'https://api.theintrodb.org/v2' }
+    );
+
+    expect(result.intro[0]).toEqual({
+      startMs: 0,
+      endMs: 90000,
+      durationMs: 90000,
+      startsAtBeginning: true,
+      endsAtMediaEnd: false,
+      confidence: 0.84,
+      submissionCount: 12,
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api.theintrodb.org/v2/media?tmdb_id=12345&details=true',
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({ Accept: 'application/json' }),
+      })
+    );
+  });
+
   it('allows getMedia to use a current user API key for pending submissions', async () => {
     const fetchMock = createFetchMock(
       createResponse({

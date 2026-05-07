@@ -51,6 +51,8 @@ const episodeSelectionSchema = z.union([
 const segmentTimestampRawSchema = z.object({
   start_ms: z.number().int().min(0).nullable(),
   end_ms: z.number().int().min(0).nullable(),
+  confidence: z.number().nullable().optional(),
+  submission_count: z.number().int().nullable().optional(),
 });
 
 const mediaResponseRawSchema = z.object({
@@ -95,6 +97,7 @@ const getMediaParamsSchema = z
     imdbId: z.string().regex(IMDB_ID_PATTERN).optional(),
     season: z.number().int().min(1).optional(),
     episode: z.number().int().min(1).optional(),
+    details: z.boolean().optional(),
   })
   .superRefine((value, ctx) => {
     if (value.tmdbId == null && value.imdbId == null) {
@@ -338,6 +341,10 @@ export function buildMediaQuery(params: GetMediaParams): URLSearchParams {
     query.set('episode', String(parsedParams.episode));
   }
 
+  if (parsedParams.details === true) {
+    query.set('details', 'true');
+  }
+
   return query;
 }
 
@@ -410,13 +417,23 @@ export function normalizeSegmentTimestamp(
   const startMs = timestamp.start_ms ?? 0;
   const endMs = timestamp.end_ms ?? null;
 
-  return {
+  const normalized: NormalizedSegmentTimestamp = {
     startMs,
     endMs,
     durationMs: endMs == null ? null : Math.max(endMs - startMs, 0),
     startsAtBeginning: timestamp.start_ms == null,
     endsAtMediaEnd: timestamp.end_ms == null,
   };
+
+  if (Object.prototype.hasOwnProperty.call(timestamp, 'confidence')) {
+    normalized.confidence = timestamp.confidence ?? null;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(timestamp, 'submission_count')) {
+    normalized.submissionCount = timestamp.submission_count ?? null;
+  }
+
+  return normalized;
 }
 
 function normalizeSegmentCollection(
