@@ -366,6 +366,27 @@ describe('TheIntroDB package', () => {
     ).toThrow(TheIntroDbResponseValidationError);
   });
 
+  it('handles plain text responses when JSON parsing fails', async () => {
+    const fetchMock = createFetchMock({
+      ok: false,
+      status: 502,
+      statusText: 'Bad Gateway',
+      headers: createHeaders(),
+      text(): Promise<string> {
+        return Promise.resolve('<html>502 Bad Gateway</html>');
+      },
+    });
+
+    await expect(
+      getMedia({ tmdbId: 12345 }, { fetch: fetchMock })
+    ).rejects.toMatchObject<Partial<TheIntroDbApiError>>({
+      name: 'TheIntroDbApiError',
+      status: 502,
+      message: 'TheIntroDB API request failed with status 502.',
+      body: '<html>502 Bad Gateway</html>',
+    });
+  });
+
   it('keeps direct timestamp normalization consistent for standalone utilities', () => {
     expect(normalizeSegmentTimestamp({ start_ms: null, end_ms: null })).toEqual(
       {
