@@ -823,8 +823,27 @@ function safeParseWithSchema<T>(
 }
 
 function flattenZodIssues(error: z.ZodError): string[] {
-  return error.issues.map(issue => {
-    const path = issue.path.length > 0 ? `${issue.path.join('.')}: ` : '';
-    return `${path}${issue.message}`;
-  });
+  const issues = error.issues;
+  const length = issues.length;
+  const result = new Array<string>(length);
+
+  for (let i = 0; i < length; i++) {
+    const issue = issues[i];
+    const path = issue.path;
+    const pathLen = path.length;
+
+    if (pathLen === 0) {
+      result[i] = issue.message;
+    } else if (pathLen === 1) {
+      result[i] = `${path[0]}: ${issue.message}`;
+    } else {
+      let pathStr = String(path[0]);
+      for (let j = 1; j < pathLen; j++) {
+        pathStr += `.${path[j]}`;
+      }
+      result[i] = `${pathStr}: ${issue.message}`;
+    }
+  }
+
+  return result;
 }
